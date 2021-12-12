@@ -1,0 +1,118 @@
+a = dir('*.jpg');
+z = numel(a);
+ for p = 0:z-1
+    
+
+I=imread(strcat(num2str(p),'.jpg'),'jpg');
+
+Igray=rgb2gray(I);
+
+[M,N]= size(Igray); % Determina el tamaño de la imagen.
+Ibin = zeros(M,N); % Imagen modificada
+
+for x = 1:M
+    for y = 1:N
+        if Igray(x,y) <= 100  % Intensidades. Estaba  170.
+            Igray(x,y) = 0;
+            Ibin(x,y) = 0;
+            else
+            Ibin(x,y) = 255;
+        end
+    end
+end
+
+% figure()
+%  imshow(Ibin)
+%            impixelinfo;
+% 
+% 
+% figure()
+%            imshow(Igray)
+%            impixelinfo;
+
+testy=imbinarize(Igray,0.39);             
+% figure()
+%            imshow(testy)
+%            impixelinfo;  
+           
+        
+   
+  BW2 = imfill(Ibin,'holes');         
+%   figure()
+%            imshow(BW2)
+%            impixelinfo;          
+%            
+[ob,nob] = bwlabel(BW2);        
+nob
+minx=0;
+miny=0;
+maxx=0;
+maxy=0;
+for i=1:nob  
+    [xTemp,yTemp]=find(ob==nob);
+    minx=min(xTemp);
+    miny=min(yTemp);
+    maxx=max(xTemp);
+    maxy=max(yTemp);
+   
+end
+hx=maxx-minx;
+hy=maxy-miny;
+
+nonIbin=255-Ibin;
+% figure()
+%            imshow(nonIbin)
+%            impixelinfo;  
+[ob2,nob2] = bwlabel(nonIbin);     
+
+
+
+nob2     
+tem = zeros(1,nob2);
+% Detección de regiones indeseadas por tamaño
+[r, c, n]= size(nonIbin);
+if nob2 > 0
+    for s = 1:nob2
+        tem(s) = length(ob2(ob2==s));  % Almacena el tamaño de cada region
+        if tem(s) < 100 || tem(s) > 400 % Menores a este valor son regiones indeseadas
+            
+            % Quitamos las regiones indeseadas
+            for i = 1:M
+                for j = 1:N
+                    if ob2(i,j) == s
+                        nonIbin(i,j) = 0; % Ponemos a 0 las regiones indeseadas
+                    end
+                end
+            end   
+        end
+    end
+end
+% 
+% figure()
+%            imshow(nonIbin)
+%            impixelinfo;
+
+
+[ob3,nob3] = bwlabel(nonIbin);
+
+    for num=1:nob3
+        
+        [x,y]=find(ob3==num);
+        im_prueba=I(min(x):max(x),min(y):max(y),:,:,:);
+        posIMGcolor{i}=im_prueba;
+        aa = dir('*.jpg');
+        zz = numel(aa);
+         imwrite(im_prueba,strcat(num2str(zz+1),'.jpg'));
+%          figure()
+%            imshow(im_prueba)
+%            impixelinfo; 
+
+    end
+
+
+
+% figure()
+%            imshow(nonIbin)
+%            impixelinfo;  
+           
+ end
